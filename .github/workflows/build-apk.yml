@@ -31,12 +31,12 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Extract Android project v6.6 Sheet Full Scroll Close Fix
+      - name: Extract Android project v6.7 Faster Sheet Scroll
         shell: bash
         run: |
           rm -rf examflow-build
           mkdir -p examflow-build
-          unzip -q ExamFlow_Italia_Android_Project_More_Features_v6_6_Sheet_Full_Scroll_Close_Fix.zip -d examflow-build
+          unzip -q ExamFlow_Italia_Android_Project_More_Features_v6_7_Faster_Sheet_Scroll.zip -d examflow-build
 
       - name: Build debug APK
         working-directory: examflow-build
@@ -45,6 +45,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ExamFlow-Italia-v6.6-Sheet-Full-Scroll-Close-Fix-APK
+          name: ExamFlow-Italia-v6.7-Faster-Sheet-Scroll-APK
           path: examflow-build/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
