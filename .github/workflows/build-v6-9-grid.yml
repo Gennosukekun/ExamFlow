@@ -1,0 +1,95 @@
+name: Build ExamFlow v6.9 Two Column Home
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android SDK 35
+        shell: bash
+        run: |
+          echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
+          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Extract stable v6.8
+        shell: bash
+        run: |
+          rm -rf examflow-build
+          mkdir examflow-build
+          unzip -q ExamFlow_Italia_Android_Project_More_Features_v6_8_Natural_Scroll.zip -d examflow-build
+
+      - name: Apply two-column Home layout
+        shell: bash
+        run: |
+          cat >> examflow-build/app/src/main/assets/styles.css <<'EOF'
+
+/* ExamFlow v6.9 - Home cards in two columns */
+#home .grid,
+#home .cards,
+#home .feature-grid,
+#home .features,
+.home-grid,
+.home-cards,
+.feature-grid,
+.features-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+}
+
+#home .card,
+#home .feature-card,
+.home-card,
+.feature-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+EOF
+
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('examflow-build/app/src/main/assets/index.html')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('</head>', '''<style id="examflow-v69-grid">
+          @media (max-width: 900px) {
+            main > section:first-of-type > div:has(> *:nth-child(4)),
+            .home .grid, .home .cards, .home .features,
+            [data-page="home"] .grid, [data-page="home"] .cards {
+              display:grid !important;
+              grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+              gap:12px !important;
+            }
+          }
+          </style></head>''')
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Build v6.9 debug APK
+        working-directory: examflow-build
+        run: gradle --no-daemon assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ExamFlow-Italia-v6.9-Two-Column-Home-APK
+          path: examflow-build/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
