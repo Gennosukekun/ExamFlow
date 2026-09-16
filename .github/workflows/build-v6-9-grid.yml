@@ -19,7 +19,8 @@ jobs:
           gradle-version: '8.9'
       - name: Extract stable v6.8
         run: |
-          rm -rf examflow-build && mkdir -p examflow-build
+          rm -rf examflow-build
+          mkdir -p examflow-build
           unzip -q ExamFlow_Italia_Android_Project_More_Features_v6_8_Natural_Scroll.zip -d examflow-build
       - name: Inspect Home markup
         run: |
@@ -29,30 +30,8 @@ jobs:
           grep -n -C 3 -E 'feature|card|home|grid|action' examflow-build/app/src/main/assets/styles.css | head -400 || true
       - name: Force two-column Home cards
         run: |
-          cat >> examflow-build/app/src/main/assets/styles.css <<'EOF'
-
-/* ExamFlow v6.9 - compact two-column Home */
-@media (max-width: 900px) {
-  .featureGrid, .feature-grid, .homeGrid, .home-grid,
-  #home .grid, #home .cards, #home .features,
-  [data-page="home"] .grid, [data-page="home"] .cards,
-  [data-page="home"] .features {
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 12px !important;
-  }
-  .featureGrid > *, .feature-grid > *, .homeGrid > *, .home-grid > *,
-  #home .grid > *, #home .cards > *, #home .features > *,
-  [data-page="home"] .grid > *, [data-page="home"] .cards > *,
-  [data-page="home"] .features > * {
-    width: 100% !important;
-    min-width: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    box-sizing: border-box !important;
-  }
-}
-EOF
+          CSS='@media(max-width:900px){.featureGrid,.feature-grid,.homeGrid,.home-grid,#home .grid,#home .cards,#home .features,[data-page="home"] .grid,[data-page="home"] .cards,[data-page="home"] .features{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}.featureGrid>*,.feature-grid>*,.homeGrid>*,.home-grid>*,#home .grid>*,#home .cards>*,#home .features>*,[data-page="home"] .grid>*,[data-page="home"] .cards>*,[data-page="home"] .features>*{width:100%!important;min-width:0!important;margin-left:0!important;margin-right:0!important;box-sizing:border-box!important}}'
+          printf '\n%s\n' "$CSS" >> examflow-build/app/src/main/assets/styles.css
       - name: Build v6.9 debug APK
         working-directory: examflow-build
         run: gradle --no-daemon assembleDebug
