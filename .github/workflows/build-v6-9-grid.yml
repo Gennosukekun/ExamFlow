@@ -24,9 +24,8 @@ jobs:
           unzip -q ExamFlow_Italia_Android_Project_More_Features_v6_8_Natural_Scroll.zip -d examflow-build
       - name: Apply exact two-column Home layout
         run: |
-          CSS='@media(max-width:900px){.quick-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.quick-grid>.quick{width:100%!important;min-width:0!important;box-sizing:border-box!important;padding:14px!important}.quick-grid>.quick b{font-size:14px!important}.quick-grid>.quick small{font-size:11px!important}.quick-grid>.quick span{margin-bottom:10px!important}}'
-          printf '\n%s\n' "$CSS" >> examflow-build/app/src/main/assets/styles.css
-          tail -3 examflow-build/app/src/main/assets/styles.css
+          printf '\n/* ExamFlow v6.9: force Home cards to 2 columns on phones */\n.quick-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.quick-grid>.quick{width:100%!important;min-width:0!important;box-sizing:border-box!important;padding:14px 10px!important}.quick-grid>.quick b{font-size:14px!important}.quick-grid>.quick small{font-size:11px!important}.quick-grid>.quick span{margin-bottom:8px!important}\n@media(max-width:370px){.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}\n' >> examflow-build/app/src/main/assets/styles.css
+          tail -8 examflow-build/app/src/main/assets/styles.css
       - name: Build v6.9 debug APK
         working-directory: examflow-build
         run: gradle --no-daemon assembleDebug
