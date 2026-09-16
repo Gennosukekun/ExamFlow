@@ -22,16 +22,11 @@ jobs:
           rm -rf examflow-build
           mkdir -p examflow-build
           unzip -q ExamFlow_Italia_Android_Project_More_Features_v6_8_Natural_Scroll.zip -d examflow-build
-      - name: Inspect Home markup
+      - name: Apply exact two-column Home layout
         run: |
-          echo '=== HOME MARKUP ==='
-          grep -n -C 10 -E 'Quiz AI|Ripasso|Focus|Flashcard|Sfide' examflow-build/app/src/main/assets/index.html || true
-          echo '=== RELEVANT CSS ==='
-          grep -n -C 3 -E 'feature|card|home|grid|action' examflow-build/app/src/main/assets/styles.css | head -400 || true
-      - name: Force two-column Home cards
-        run: |
-          CSS='@media(max-width:900px){.featureGrid,.feature-grid,.homeGrid,.home-grid,#home .grid,#home .cards,#home .features,[data-page="home"] .grid,[data-page="home"] .cards,[data-page="home"] .features{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}.featureGrid>*,.feature-grid>*,.homeGrid>*,.home-grid>*,#home .grid>*,#home .cards>*,#home .features>*,[data-page="home"] .grid>*,[data-page="home"] .cards>*,[data-page="home"] .features>*{width:100%!important;min-width:0!important;margin-left:0!important;margin-right:0!important;box-sizing:border-box!important}}'
+          CSS='@media(max-width:900px){.quick-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.quick-grid>.quick{width:100%!important;min-width:0!important;box-sizing:border-box!important;padding:14px!important}.quick-grid>.quick b{font-size:14px!important}.quick-grid>.quick small{font-size:11px!important}.quick-grid>.quick span{margin-bottom:10px!important}}'
           printf '\n%s\n' "$CSS" >> examflow-build/app/src/main/assets/styles.css
+          tail -3 examflow-build/app/src/main/assets/styles.css
       - name: Build v6.9 debug APK
         working-directory: examflow-build
         run: gradle --no-daemon assembleDebug
